@@ -14,6 +14,7 @@ public class ApplicationDbContext:DbContext
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)
     {
+        
     }
     public override int SaveChanges()
     {
@@ -21,8 +22,12 @@ public class ApplicationDbContext:DbContext
         return base.SaveChanges();
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-      //  optionsBuilder.UseSqlite("basededatos.db");
-    }
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //{
+    //    optionsBuilder.UseSqlite("basededatos.db");
+    //}
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+          modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
 }

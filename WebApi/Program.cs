@@ -1,6 +1,7 @@
 using Application;
 using Microsoft.EntityFrameworkCore;
 using Persistance;
+using WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMyServices();
-builder.Services.AddDbContext<ApplicationDbContext>();
-builder.Services.AddMyRepos();
+//builder.Services.AddDbContext<ApplicationDbContext>();
+builder.Services.AddPersistance(builder.Configuration);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "CorsConfiguration",
+                      builder =>
+                      {
+                          builder
+                          .WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowAnyOrigin();
+                          //.AllowCredentials();
+                      });
+});
 
 
 var app = builder.Build();
@@ -21,10 +35,14 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => {
+        string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
+        c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json","car_api");
+    });
 }
-
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseHttpsRedirection();
+app.UseCors("CorsConfiguration");
 
 app.UseAuthorization();
 

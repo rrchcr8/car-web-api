@@ -12,7 +12,7 @@ public static class ServiceCollection
 {
     public static IServiceCollection AddMyServices(this IServiceCollection services)
     {
-        services.AddSingleton<ICarService, CarService>();
+        services.AddScoped<ICarService, CarService>();
 
         return services;
     }
