@@ -17,6 +17,15 @@ namespace WebApi.Controllers
         {
             _carService = carService;
         }
+        
+        [HttpGet("all/")]
+
+        public async Task<IActionResult> GetCars()
+        {
+            var owners = await _carService.GetAllCarsAsync();
+
+            return Ok(owners);
+        }
 
         [HttpPost("add/")]
         public async Task<IActionResult> CreateCar([FromBody] CarRequest carRequest )

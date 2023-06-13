@@ -14,10 +14,27 @@ public class CarService : ICarService
         _carRepository = carRepository;
     }
 
-    public async Task<Car> CreateCarAsync(CarRequest carRequest)
+    public async Task<Car?> CreateCarAsync(CarRequest carRequest)
     {
         var car = carRequest.Adapt<Car>();
-        await _carRepository.Insert(car);
-        return car;
+        //- Logic to avoid insert duplicate records.
+        List<Car> cars = (await _carRepository.GetCarsAsync()).ToList();
+        if (!cars.Any(c => c.Model.Equals(car.Model) 
+        && c.Name.Equals(car.Name) 
+        && c.Year.Equals(car.Year)))
+        {
+            await _carRepository.Insert(car);
+            return car;
+        }
+        else 
+        {
+            return null;
+        }
+        
+    }
+
+    public async Task<IEnumerable<Car>> GetAllCarsAsync()
+    {
+        return await _carRepository.GetCarsAsync();
     }
 }
